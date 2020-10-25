@@ -1,0 +1,8 @@
+---
+
+#Checktheitem
+check_item: ["cluster_node_overview","clusterversion_overview","clusterversion_details","clusteroperator_overview","clusteroperator_details","cluster_API_health_overview","etcd_overview","etcd_details","openshift_console_overview","openshift_ingress_overview","openshift_machine_config_operator_overview","openshift_kube_apiserver_overview","openshift_apiserver_overview","openshift_kube_controller_manager_overview","openshift_kube_scheduler_overview","openshift_authentication_overview","openshift_dns_overview","openshift_monitoring_overview","openshift_sdn_overview","openshift_image_registry_overview","clusternetwork_overview","node_cpu_memory_resource","machineconfigpool","machine_config","apiserver_certificate_expiration_time","machineconfigpool_paused_status","node_machineconfiguration","imagecontentsourcepolicies","images_config"]
+
+
+#reportexportfilepath
+export_file: /tmp/machine_check_report.xls

@@ -1,0 +1,286 @@
+---
+# tasks file for machine_check
+
+- name: cluster node overview
+  shell: |
+    oc get node --show-labels --show-kind --sort-by='{.metadata.name}' -o wide
+  changed_when: False
+  ignore_errors: yes
+  register: cluster_node_overview
+- set_fact:
+    cluster_node_overview: "{{ cluster_node_overview }}"
+
+- name: clusterversion overview
+  shell: |
+    oc get clusterversion
+  changed_when: False
+  ignore_errors: yes
+  register: clusterversion_overview
+- set_fact:
+    clusterversion_overview: "{{ clusterversion_overview }}"
+
+- name: clusterversion details
+  shell: |
+    oc get clusterversion/version -o yaml | grep -A10000 '^spec:'
+  changed_when: False
+  ignore_errors: yes
+  register: clusterversion_details
+- set_fact:
+    clusterversion_details: "{{ clusterversion_details }}"
+
+- name: clusteroperator overview
+  shell: |
+    oc get clusteroperator
+  changed_when: False
+  ignore_errors: yes
+  register: clusteroperator_overview
+- set_fact:
+    clusteroperator_overview: "{{ clusteroperator_overview }}"
+
+- name: clusteroperator details
+  shell: |
+    cos=$(oc get co -o name)
+    for co in $cos; do
+      echo "$co: " ;
+      oc get $co -o jsonpath='{.status.conditions}' ;
+      echo '' ;
+      echo '' ;
+    done
+  changed_when: False
+  ignore_errors: yes
+  register: clusteroperator_details
+- set_fact:
+    clusteroperator_details: "{{ clusteroperator_details }}"
+
+- name: cluster API health overview
+  shell: |
+    oc get --raw='/readyz?verbose'
+  changed_when: False
+  ignore_errors: yes
+  register: cluster_API_health_overview
+- set_fact:
+    cluster_API_health_overview: "{{ cluster_API_health_overview }}"
+
+- name: etcd overview 
+  shell: |
+    oc -n openshift-etcd get pods -l=etcd -o wide
+  changed_when: False
+  ignore_errors: yes
+  register: etcd_overview
+- set_fact:
+    etcd_overview: "{{ etcd_overview }}"
+
+- name: etcd details
+  shell: |
+    oc -n openshift-etcd rsh -c etcdctl `oc -n openshift-etcd get pods -l=etcd  | grep Running | head -n1 | awk '{print $1}'` etcdctl endpoint status
+  changed_when: False
+  ignore_errors: yes
+  register: etcd_details
+- set_fact:
+    etcd_details: "{{ etcd_details }}"
+
+- name: openshift-console overview 
+  shell: |
+    oc -n openshift-console get pod -o wide --sort-by=.spec.nodeName
+  changed_when: False
+  ignore_errors: yes
+  register: openshift_console_overview
+- set_fact:
+    openshift_console_overview: "{{ openshift_console_overview }}"
+
+- name: openshift-ingress overview
+  shell: |
+    oc -n openshift-ingress get pod -o wide --sort-by=.spec.nodeName
+  changed_when: False
+  ignore_errors: yes
+  register: openshift_ingress_overview
+- set_fact:
+    openshift_ingress_overview: "{{ openshift_ingress_overview }}"
+
+- name: openshift-machine-config-operator overview
+  shell: |
+    oc -n openshift-machine-config-operator get pod -o wide --sort-by=.spec.nodeName
+  changed_when: False
+  ignore_errors: yes
+  register: openshift_machine_config_operator_overview
+- set_fact:
+    openshift_machine_config_operator_overview: "{{ openshift_machine_config_operator_overview }}"
+
+- name: openshift-kube-apiserver overview
+  shell: |
+    oc -n openshift-kube-apiserver get pod -l=apiserver -o wide --sort-by=.spec.nodeName
+  changed_when: False
+  ignore_errors: yes
+  register: openshift_kube_apiserver_overview
+- set_fact:
+    openshift_kube_apiserver_overview: "{{ openshift_kube_apiserver_overview }}"
+
+- name: openshift-apiserver overview
+  shell: |
+    oc -n openshift-apiserver get pod -l=apiserver -o wide --sort-by=.spec.nodeName
+  changed_when: False
+  ignore_errors: yes
+  register: openshift_apiserver_overview
+- set_fact:
+    openshift_apiserver_overview: "{{ openshift_apiserver_overview }}"
+
+- name: openshift-kube-controller-manager overview
+  shell: |
+    oc -n openshift-kube-controller-manager get pod -l=kube-controller-manager -o wide --sort-by=.spec.nodeName
+  changed_when: False
+  ignore_errors: yes
+  register: openshift_kube_controller_manager_overview
+- set_fact:
+    openshift_kube_controller_manager_overview: "{{ openshift_kube_controller_manager_overview }}"
+
+- name: openshift-kube-scheduler overview 
+  shell: |
+    oc -n openshift-kube-scheduler get pod -l=scheduler -o wide --sort-by=.spec.nodeName 
+  changed_when: False
+  ignore_errors: yes
+  register: openshift_kube_scheduler_overview
+- set_fact:
+    openshift_kube_scheduler_overview: "{{ openshift_kube_scheduler_overview }}"
+
+- name: openshift-authentication overview
+  shell: |
+    oc -n openshift-authentication get pods -o wide --sort-by=.spec.nodeName
+  changed_when: False
+  ignore_errors: yes
+  register: openshift_authentication_overview
+- set_fact:
+    openshift_authentication_overview: "{{ openshift_authentication_overview }}"
+
+- name: openshift-dns overview
+  shell: |
+    oc -n openshift-dns get pods -o wide --sort-by=.spec.nodeName 
+  changed_when: False
+  ignore_errors: yes
+  register: openshift_dns_overview
+- set_fact:
+    openshift_dns_overview: "{{ openshift_dns_overview }}"
+
+- name: openshift-monitoring overview 
+  shell: |
+    oc -n openshift-monitoring get pods -o wide --sort-by=.spec.nodeName
+  changed_when: False
+  ignore_errors: yes
+  register: openshift_monitoring_overview
+- set_fact:
+    openshift_monitoring_overview: "{{ openshift_monitoring_overview }}"
+
+- name: openshift-sdn overview
+  shell: |
+    oc -n openshift-sdn get pods -o wide --sort-by=.spec.nodeName
+  changed_when: False
+  ignore_errors: yes
+  register: openshift_sdn_overview
+- set_fact:
+    openshift_sdn_overview: "{{ openshift_sdn_overview }}"
+
+- name: openshift-image-registry overview
+  shell: |
+    oc -n openshift-image-registry get pod -o wide --sort-by=.spec.nodeName
+  changed_when: False
+  ignore_errors: yes
+  register: openshift_image_registry_overview
+- set_fact:
+    openshift_image_registry_overview: "{{ openshift_image_registry_overview }}"
+
+- name: clusternetwork overview
+  shell: |
+    oc get clusternetwork  ; oc get hostsubnet 
+  changed_when: False
+  ignore_errors: yes
+  register: clusternetwork_overview
+- set_fact:
+    clusternetwork_overview: "{{ clusternetwork_overview }}"
+
+- name: node cpu memory resource
+  shell: |
+    nodes=$(oc get node --no-headers -o custom-columns=NAME:.metadata.name)
+    for node in $nodes; do
+      echo "Node: $node"
+      oc describe node "$node" | sed '1,/Non-terminated Pods/d'
+      echo
+    done
+  changed_when: False
+  ignore_errors: yes
+  register: node_cpu_memory_resource
+- set_fact:
+    node_cpu_memory_resource: "{{ node_cpu_memory_resource }}"
+
+- name: machineconfigpool
+  shell: |
+    oc get mcp
+  changed_when: False
+  ignore_errors: yes
+  register: machineconfigpool 
+- set_fact:
+    machineconfigpool: "{{ machineconfigpool }}"
+
+- name: machine-config
+  shell: |
+    oc get mc
+  changed_when: False
+  ignore_errors: yes
+  register: machine_config
+- set_fact:
+    machine_config: "{{ machine_config }}"
+
+- name: apiserver certificate expiration time
+  shell: |
+    oc -n openshift-kube-apiserver-operator get secret kube-apiserver-to-kubelet-signer -o jsonpath='{.metadata.annotations.auth\.openshift\.io/certificate-not-after}'
+  changed_when: False
+  ignore_errors: yes
+  register: apiserver_certificate_expiration_time
+- set_fact:
+    apiserver_certificate_expiration_time: "{{ apiserver_certificate_expiration_time }}"
+
+- name: machineconfigpool paused status
+  shell: |
+    pools=$(oc get mcp -o name)
+    for pool in $pools ; do 
+      echo -n "$pool: " ;
+      oc get $pool -o jsonpath='{.spec.paused}' ; 
+      echo '' ; 
+    done
+  changed_when: False
+  ignore_errors: yes
+  register: machineconfigpool_paused_status
+- set_fact:
+    machineconfigpool_paused_status: "{{ machineconfigpool_paused_status }}"
+
+- name: node machineconfiguration
+  shell: |
+    nodes=$(oc get node --no-headers -o custom-columns=NAME:.metadata.name)
+    for node in $nodes; do
+      echo "Node: $node"
+      oc describe node "$node" | awk '/machineconfiguration.openshift.io/'
+      echo
+    done
+  changed_when: False
+  ignore_errors: yes
+  register: node_machineconfiguration
+- set_fact:
+    node_machineconfiguration: "{{ node_machineconfiguration }}"
+
+- name: imagecontentsourcepolicies
+  shell: |
+    oc get imagecontentsourcepolicies -o yaml
+  changed_when: False
+  ignore_errors: yes
+  register: imagecontentsourcepolicies
+- set_fact:
+    imagecontentsourcepolicies: "{{ imagecontentsourcepolicies }}"
+
+- name: images.config
+  shell: |
+    oc get images.config.openshift.io -o yaml
+  changed_when: False
+  ignore_errors: yes
+  register: images_config
+- set_fact:
+    images_config: "{{ images_config }}"
+
+

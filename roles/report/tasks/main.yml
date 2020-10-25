@@ -1,0 +1,17 @@
+---
+
+#- debug:
+#    var: hostvars
+
+- name: Export system security configuration check to excel
+  local_action: exportReport
+     hostvars="{{hostvars}}"
+     check_item="{{check_item}}"
+     export_file="{{export_file}}"
+  run_once: true
+
+#- name: Export disk filesystem information to excel
+#  local_action: collect
+#     hostvars="{{hostvars}}"
+#     collect_file="{{collect_file}}"
+#  run_once: true

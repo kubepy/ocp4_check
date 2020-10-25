@@ -1,0 +1,12 @@
+---
+- name: Machine Check for hosts.
+  hosts: all
+  gather_facts: false
+  roles:
+    - machine_check
+
+- name: Gnerate report
+  hosts: localhost
+  gather_facts: false
+  roles:
+    - report
