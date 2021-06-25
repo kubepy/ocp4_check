@@ -1,2 +1,4 @@
 [client]
 127.0.0.2 ansible_connection=local
+
+[all:vars]
